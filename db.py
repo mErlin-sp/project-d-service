@@ -45,8 +45,9 @@ class DB:
             # Create a tracked_queries table
             cur.execute('''
                 CREATE TABLE IF NOT EXISTS tracked_queries (
-                    ID INT NOT NULL AUTO_INCREMENT,
-                    NAME VARCHAR(255) NOT NULL,
+                    id INT NOT NULL AUTO_INCREMENT,
+                    query VARCHAR(255) NOT NULL,
+                    active BOOLEAN DEFAULT TRUE,
                     PRIMARY KEY (ID)
                 );
             ''')
@@ -54,13 +55,42 @@ class DB:
 
             # Update tracked_queries table
             cur.execute('''
-                INSERT INTO tracked_queries (ID, NAME) VALUES (1, 'Iphone 12 64GB Blue')
-                ON DUPLICATE KEY UPDATE NAME = 'Iphone 12 64GB Blue';
-            ''', {'raise_on_warnings': True})
+                INSERT INTO tracked_queries (id, query) VALUES (1, 'Iphone 12 64GB')
+                ON DUPLICATE KEY UPDATE query = 'Iphone 12 64GB';
+            ''')
+            print('tracked_queries table updated')
+
+            # Create goods table
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS goods (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    platform VARCHAR(255) NOT NULL,
+                    platform_id INT NOT NULL,
+                    query_id INT NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    href VARCHAR(255) NOT NULL,
+                    img_href VARCHAR(255),
+                    brand VARCHAR(255),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (query_id) REFERENCES tracked_queries(id)
+                );
+            ''')
+            print('goods table created')
+
+            # Create prices table
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS prices (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    good_id INT NOT NULL,
+                    price DECIMAL(10, 2) NOT NULL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (good_id) REFERENCES goods(id)
+                );
+            ''')
+            print('prices table created')
 
             # Make sure data is committed to the database
             self.cnx.commit()
-            print('tracked_queries table updated')
 
         except mysql.connector.Error as e:
             print('DB Init Error:', e)
@@ -83,7 +113,24 @@ class DB:
             return rows
 
         except mysql.connector.Error as e:
-            print('Get Requests Error:', e)
+            print('Get Queries Error:', e)
+            return []
+
+    def get_active_queries(self):
+        try:
+            # Get a cursor
+            cur = self.cnx.cursor()
+
+            # Execute a query
+            cur.execute('SELECT query FROM tracked_queries WHERE active = TRUE')
+
+            # Fetch all results
+            rows = cur.fetchall()[0]
+            cur.close()
+            return rows
+
+        except mysql.connector.Error as e:
+            print('Get Queries Error:', e)
             return []
 
     def db_close(self):
