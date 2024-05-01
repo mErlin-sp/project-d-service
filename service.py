@@ -35,9 +35,9 @@ async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
 
-@api.get("/db/requests")
-async def get_requests():
-    return {"rows": db.get_requests()}
+@api.get("/db/queries")
+async def get_queries():
+    return {"rows": db.get_queries()}
 
 
 def run_api():
@@ -54,7 +54,7 @@ def init():
 def update_db():
     print('Updating DB...')
     print('Current time: ', time.ctime())
-    print('Requests: ', db.get_requests())
+    print('Requests: ', db.get_queries())
     print('DB updated.')
 
 

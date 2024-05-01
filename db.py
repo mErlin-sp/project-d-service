@@ -42,25 +42,25 @@ class DB:
             row = cur.fetchone()
             print("Current date is: {0}".format(row[0]))
 
-            # Create a REQUESTS table
+            # Create a tracked_queries table
             cur.execute('''
-                CREATE TABLE IF NOT EXISTS REQUESTS (
+                CREATE TABLE IF NOT EXISTS tracked_queries (
                     ID INT NOT NULL AUTO_INCREMENT,
                     NAME VARCHAR(255) NOT NULL,
                     PRIMARY KEY (ID)
                 );
             ''')
-            print('REQUESTS table created')
+            print('tracked_queries table created')
 
-            # Update REQUESTS table
+            # Update tracked_queries table
             cur.execute('''
-                INSERT INTO REQUESTS (ID, NAME) VALUES (1, 'Iphone 12 64GB Blue')
+                INSERT INTO tracked_queries (ID, NAME) VALUES (1, 'Iphone 12 64GB Blue')
                 ON DUPLICATE KEY UPDATE NAME = 'Iphone 12 64GB Blue';
             ''', {'raise_on_warnings': True})
 
             # Make sure data is committed to the database
             self.cnx.commit()
-            print('REQUESTS table updated')
+            print('tracked_queries table updated')
 
         except mysql.connector.Error as e:
             print('DB Init Error:', e)
@@ -69,13 +69,13 @@ class DB:
             print('DB Init successful')
             cur.close()
 
-    def get_requests(self):
+    def get_queries(self):
         try:
             # Get a cursor
             cur = self.cnx.cursor()
 
             # Execute a query
-            cur.execute('SELECT * FROM REQUESTS')
+            cur.execute('SELECT * FROM tracked_queries')
 
             # Fetch all results
             rows = cur.fetchall()
