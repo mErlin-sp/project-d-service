@@ -85,19 +85,20 @@ def update_db(db: DB, platforms_dir: str, log_dir: str = None):
     print('Current time: ', time.ctime())
 
     queries = db.get_active_queries()
-    print('Active queries: ', queries)
+    if queries:
+        print('Active queries: ', queries)
+    else:
+        print('No active queries.')
+        print('--' * 50)
+        print('')
+        return
 
     platforms = list_platforms(platforms_dir)
 
     for platform, module in platforms:
         for query_id, query in queries:
             try:
-                print('Fetching data from', platform, 'for query:', query)
                 data = module.fetch_data(query)
-                print('Data fetched successfully!')
-
-                update_db_with_fetch_data(db, data, platform, query_id)
-
                 if log_dir:
                     try:
                         path = os.path.join(log_dir, platform)
@@ -106,8 +107,10 @@ def update_db(db: DB, platforms_dir: str, log_dir: str = None):
                             json.dump(data, f, indent=2)
                     except Exception as e:
                         print('Failed to save fetched data:', e)
+
+                update_db_with_fetch_data(db, data, platform, query_id)
             except Exception as e:
-                print('Fetch data from platform', platform, 'error:', e)
+                print('Update DB for platform', platform, 'query', query, 'error:', e)
 
     print('DB updated.')
     print('--' * 50)
