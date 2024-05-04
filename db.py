@@ -97,6 +97,8 @@ class DB:
             exit(0)
         else:
             print('DB Init successful')
+            print('--' * 50)
+            print('')
             cur.close()
 
     def get_queries(self):
@@ -122,16 +124,38 @@ class DB:
             cur = self.cnx.cursor()
 
             # Execute a query
-            cur.execute('SELECT query FROM tracked_queries WHERE active = TRUE')
+            cur.execute('SELECT id,query FROM tracked_queries WHERE active = TRUE')
 
             # Fetch all results
-            rows = cur.fetchall()[0]
+            rows = cur.fetchall()
             cur.close()
-            return rows
 
+            return rows
         except mysql.connector.Error as e:
             print('Get Queries Error:', e)
             return []
+
+    def execute_query(self, query: str, _kwargs=None, last_row_id=False):
+        if _kwargs is None:
+            _kwargs = []
+        try:
+            # Get a cursor
+            cur = self.cnx.cursor()
+
+            # Execute a query
+            cur.execute(query, _kwargs)
+
+            if last_row_id:
+                return cur.lastrowid
+
+            return cur.fetchall()
+
+        except mysql.connector.Error as e:
+            print('Execute Query Error:', e)
+            raise e
+        finally:
+            # Make sure data is committed to the database
+            self.cnx.commit()
 
     def db_close(self):
         try:
