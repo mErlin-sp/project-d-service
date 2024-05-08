@@ -1,0 +1,256 @@
+query SearchListingPageQuery($search_term: String!, $sort: String, $offset: Int, $limit: Int, $currentRegionId: Int) {
+    searchListing(
+        search_term: $search_term
+        sort: $sort
+        offset: $offset
+        limit: $limit
+    ) {
+        #        advSource
+        page {
+            #            flippedSearchTerm
+            ...standardListingFragment
+            __typename
+        }
+        #        filters {
+        #            ...categoryFiltersFragment
+        #            ...standardFiltersFragment
+        #            ...regionFilterFragment
+        #            __typename
+        #        }
+        __typename
+    }
+}
+
+fragment standardListingFragment on ListingPage {
+    total
+    products {
+        ...productItemFragment
+        #        advert {
+        #            ...advTrackingAdvertFragment
+        #            __typename
+        #        }
+        #        productClickTracking {
+        #            advClickTrackingUrl
+        #            power {
+        #                prefix
+        #                complexity
+        #                __typename
+        #            }
+        #            __typename
+        #        }
+        #        advDebug {
+        #            conversion
+        #            score
+        #            companyRating
+        #            __typename
+        #        }
+        __typename
+    }
+    #    relatedSmartcats {
+    #        id
+    #        name
+    #        url
+    #        __typename
+    #    }
+    #    otherRegions {
+    #        id
+    #        name
+    #        url
+    #        __typename
+    #    }
+    #    seoCategory {
+    #        id
+    #        alias
+    #        caption
+    #        url
+    #        path {
+    #            url
+    #            caption
+    #            id
+    #            alias
+    #            __typename
+    #        }
+    #        __typename
+    #    }
+    __typename
+}
+
+fragment productItemFragment on ProductItem {
+    product {
+        id
+        url
+        name
+        alias
+        price
+        labels {
+            hasEvoPay
+            __typename
+        }
+        categoryId
+        categoryIds
+        isAdult
+        canBeOrdered
+        productSign
+        measureUnit
+        currency
+        currencyTitle
+        isPriceFrom
+        priceOriginal
+        hasDiscount
+        presence
+        presenceTitle
+        discountedPrice
+        canShowPrice
+        priceBySettings
+        companyId
+        manufacturerInfo {
+            name
+            url
+            id
+            __typename
+        }
+        regions(currentRegionId: $currentRegionId, limit: 1) {
+            name
+            nameF2
+            isCity
+            __typename
+        }
+        company {
+            name
+            city
+            companySla {
+                rating
+                __typename
+            }
+            __typename
+        }
+        discount {
+            percent
+            amount
+            __typename
+        }
+        mainImage {
+            id
+            url(width: 200, height: 200)
+            __typename
+        }
+        category {
+            id
+            path {
+                id
+                caption
+                __typename
+            }
+            __typename
+        }
+        __typename
+    }
+    #    advert {
+    #        position
+    #        price
+    #        type
+    #        clickTrackingData
+    #        __typename
+    #    }
+    __typename
+}
+
+#fragment advTrackingAdvertFragment on Advert {
+#    productId
+#    companyId
+#    campaignId
+#    categoryId
+#    hash
+#    __typename
+#}
+
+#fragment standardFiltersFragment on ListingFilters {
+#    total
+#    attributeFilters {
+#        type
+#        name
+#        title
+#        min
+#        max
+#        fromValue
+#        toValue
+#        measureUnit
+#        values {
+#            value
+#            count
+#            caption
+#            selected
+#            __typename
+#        }
+#        __typename
+#    }
+#    deliveryFilter {
+#        name
+#        title
+#        values {
+#            selected
+#            value
+#            count
+#            caption
+#            __typename
+#        }
+#        __typename
+#    }
+#    binaryFilters {
+#        selected
+#        value
+#        count
+#        title
+#        name
+#        __typename
+#    }
+#    priceFilter {
+#        type
+#        name
+#        title
+#        min
+#        max
+#        fromValue
+#        toValue
+#        measureUnit
+#        __typename
+#    }
+#    __typename
+#}
+#
+#fragment categoryFiltersFragment on ListingFilters {
+#    categoryFilter {
+#        name
+#        title
+#        type
+#        values {
+#            id
+#            caption
+#            level
+#            parent
+#            selected
+#            count
+#            url
+#            __typename
+#        }
+#        __typename
+#    }
+#    __typename
+#}
+#
+#fragment regionFilterFragment on ListingFilters {
+#    regionFilter {
+#        name
+#        title
+#        deliveryType
+#        values {
+#            id
+#            name
+#            alias
+#            selected
+#            __typename
+#        }
+#        __typename
+#    }
+#    __typename
+#}
