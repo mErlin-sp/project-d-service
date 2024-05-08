@@ -8,7 +8,7 @@ platform_name = 'rozetka'
 url = 'https://search.rozetka.com.ua/ua/search/api/v6/'
 params = {'country': 'UA', 'lang': 'ua'}
 
-log_dir = 'platforms/fetched/rozetka/'
+log_dir = f'platforms/fetched/{platform_name}/'
 
 
 def search_query(query: str, timeout: int = 30) -> dict:

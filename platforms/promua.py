@@ -17,7 +17,7 @@ params = {
     'offset': 0
 }
 
-log_dir = 'platforms/fetched/promua/'
+log_dir = f'platforms/fetched/{platform_name}/'
 
 
 def search_query(query: str, timeout: int = 60 * 5) -> dict:
