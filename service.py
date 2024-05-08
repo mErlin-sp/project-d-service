@@ -68,7 +68,7 @@ if __name__ == '__main__':
     api_thread.start()
 
     # Schedule the job to run every minute
-    schedule.every().minute.do(worker.update_db, db, platforms_dir)
+    schedule.every(5).minutes.do(worker.update_db, db, platforms_dir)
     print('DB update scheduled.')
     print('--' * 50)
     print('')
