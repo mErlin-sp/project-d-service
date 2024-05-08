@@ -18,7 +18,7 @@ params = {'offset': 0,
 log_dir = f'platforms/fetched/{platform_name}/'
 
 
-def search_query(query: str, timeout: int = 60 * 5) -> dict:
+def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
     print('Fetching data from OLX')
     print('Query:', query)
 
@@ -92,7 +92,7 @@ def search_query(query: str, timeout: int = 60 * 5) -> dict:
 
         print('done')
         offset += limit
-        time.sleep(3)
+        time.sleep(delay)
 
     print('Fetching data from', platform_name, 'done')
     return result_data

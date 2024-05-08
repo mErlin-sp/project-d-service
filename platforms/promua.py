@@ -7,7 +7,7 @@ from gql import Client, gql
 
 platform_name = 'promua'
 url = 'https://prom.ua/graphql'
-gql_query_filepath = 'platforms/gql/promua-gql-query.gql'
+gql_query_filepath = 'platforms/gql/promua/promua-gql-query.gql'
 
 limit = 95
 max_products = None
@@ -20,7 +20,7 @@ params = {
 log_dir = f'platforms/fetched/{platform_name}/'
 
 
-def search_query(query: str, timeout: int = 60 * 5) -> dict:
+def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
     print('Fetching data from PromUA')
     print('Query:', query)
 
@@ -90,7 +90,7 @@ def search_query(query: str, timeout: int = 60 * 5) -> dict:
 
         print('done')
         offset += limit
-        time.sleep(3)
+        time.sleep(delay)
 
     print('Fetching data from', platform_name, 'done')
     return result_data

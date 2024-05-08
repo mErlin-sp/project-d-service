@@ -1,0 +1,7 @@
+projects:
+  bigl-gql:
+    schema: bigl/bigl-gql-schema.graphql
+    documents: 'bigl/**/*.{gql,graphql}'
+  promua:
+    schema: promua/promua-gql-schema.graphql
+    documents: 'promua/**/*.{gql,graphql}'
