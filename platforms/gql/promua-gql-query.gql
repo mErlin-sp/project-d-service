@@ -1,0 +1,415 @@
+query SearchListingQuery($search_term: String!, $offset: Int, $limit: Int, $params: Any, $company_id: Int, $sort: String, $regionId: Int = null, $subdomain: String = null) {
+    searchListing(
+        search_term: $search_term
+        limit: $limit
+        offset: $offset
+        params: $params
+        company_id: $company_id
+        sort: $sort
+        region: {id: $regionId, subdomain: $subdomain}
+    ) {
+        searchTerm
+        page {
+            mainWordMatch
+            mainEntityMatch
+            attributesMatch
+            correctedSearchTerm
+            ...ProductsListFragment
+            __typename
+        }
+        #        searchTermData {
+        #            region {
+        #                id
+        #                subdomain
+        #                __typename
+        #            }
+        #            wholesale
+        #            discount
+        #            productType
+        #            isAdult
+        #            mainWord
+        #            mainEntity
+        #            attributes
+        #            searchTermProcessed
+        #            categoryId
+        #            possibleCatSource
+        #            categoryProba
+        #            __typename
+        #        }
+        __typename
+    }
+    #    region(region: {id: $regionId, subdomain: $subdomain}) {
+    #        id
+    #        name
+    #        nameF2
+    #        isCity
+    #        subdomain
+    #        __typename
+    #    }
+    #    country {
+    #        name
+    #        nameF2
+    #        __typename
+    #    }
+}
+
+fragment ProductsListFragment on ListingPage {
+    total
+    article
+    lang
+    mainWordMatch
+    mainEntityMatch
+    notEnoughProducts
+    attributesMatch
+#    topHitsCategory {
+#        id
+#        path {
+#            id
+#            caption
+#            __typename
+#        }
+#        __typename
+#    }
+    products {
+        ...ProductsItemFragment
+        __typename
+    }
+#    productsBadMatch {
+#        ...ProductsItemFragment
+#        __typename
+#    }
+    companyIds
+#    quickFilters {
+#        name
+#        title
+#        measureUnit
+#        values {
+#            value
+#            title
+#            imageUrl(width: 200, height: 200)
+#            __typename
+#        }
+#        __typename
+#    }
+    __typename
+}
+
+fragment ProductsItemFragment on ProductItem {
+    product_item_id
+    product {
+        ...ProductFragment
+        id
+        company {
+            id
+            __typename
+        }
+        __typename
+    }
+    __typename
+}
+
+fragment ProductFragment on Product{
+    id
+    name
+    price
+    priceCurrency
+    isService
+    groupId
+    categoryId
+    company_id
+    image(width: 200, height: 200)
+    descriptionPlain
+    descriptionFull
+    urlForProductViewOnSite
+    urlText
+    manufacturer
+}
+
+#fragment ProductTileProductItemFragment on ProductItem {
+#    product {
+#        id
+#        is14Plus
+#        isService
+#        ordersCount
+#        presence {
+#            presence
+#            __typename
+#        }
+#        groupId
+#        productTypeKey
+#        priceOriginal
+#        priceUSD
+#        categoryId
+#        categoryIds
+#        company_id
+#        productOpinionCounters {
+#            rating
+#            count
+#            __typename
+#        }
+#        company {
+#            id
+#            segment
+#            deliveryStats {
+#                deliverySpeed
+#                __typename
+#            }
+#            ...ProductTileCompanyDetailsFragment
+#            __typename
+#        }
+#        attributesCatalog @include(if: $includeAttributes) {
+#            id
+#            value
+#            __typename
+#        }
+#        priceCurrencyLocalized
+#        ...ProductSchemaOrgFragment
+#        ...ProductTilePromoLabelFragment
+#        ...ProductTileImageFragment
+#        ...ProductPresenceFragment
+#        ...ProductPriceFragment
+#        ...ConversionAndFavoriteBlockProductFragment
+#        __typename
+#    }
+#    ltrLog
+#    score
+#    isDisabled
+#    keywordsStrict
+#    productModel {
+#        model_id
+#        min_price
+#        product_count
+#        company_count
+#        max_price
+#        model_product_ids
+#        __typename
+#    }
+#    __typename
+#}
+#
+#fragment ProductSchemaOrgFragment on Product {
+#    id
+#    name: nameForCatalog
+#    sku
+#    imageForProductSchema: image(width: 200, height: 200)
+#    imagesForProductSchema: images(width: 200, height: 200)
+#    urlForProductCatalog
+#    categoryIds
+#    priceCurrency
+#    price
+#    discountDays
+#    discountedPrice
+#    hasDiscount
+#    isAdult
+#    buyButtonDisplayType
+#    measureUnitCommonCode
+#    wholesalePrices {
+#        id
+#        measureUnitCommonCode
+#        minimumOrderQuantity
+#        price
+#        __typename
+#    }
+#    presence {
+#        presence
+#        __typename
+#    }
+#    company {
+#        id
+#        name
+#        returnPolicy {
+#            id
+#            returnTerms
+#            __typename
+#        }
+#        opinionStats {
+#            id
+#            opinionPositivePercent
+#            opinionTotal
+#            __typename
+#        }
+#        __typename
+#    }
+#    manufacturerInfo {
+#        name
+#        __typename
+#    }
+#    rating
+#    opinionCount
+#    __typename
+#}
+#
+#fragment ProductTilePromoLabelFragment on Product {
+#    promoLabelBanner {
+#        id
+#        imageUrl(width: 640, height: 640)
+#        imageDarkUrl(width: 640, height: 640)
+#        imageWidth
+#        imageHeight
+#        text
+#        __typename
+#    }
+#    __typename
+#}
+#
+#fragment ProductTileImageFragment on Product {
+#    id
+#    image(width: 200, height: 200)
+#    image400x400: image(width: 400, height: 400)
+#    imageAlt: image(width: 640, height: 640)
+#    is14Plus
+#    isAdult
+#    name: nameForCatalog
+#    __typename
+#}
+#
+#fragment ProductPresenceFragment on Product {
+#    presence {
+#        presence
+#        isAvailable
+#        isEnding
+#        isOrderable
+#        isWait
+#        isPresenceSure
+#        __typename
+#    }
+#    catalogPresence {
+#        value
+#        title
+#        titleExt
+#        titleUnavailable
+#        availabilityDate
+#        __typename
+#    }
+#    __typename
+#}
+#
+#fragment ProductPriceFragment on Product {
+#    id
+#    price
+#    priceCurrencyLocalized
+#    hasDiscount
+#    discountedPrice
+#    noPriceText
+#    measureUnit
+#    priceFrom
+#    discountDaysLabel
+#    canShowPrice
+#    wholesalePrices {
+#        id
+#        price
+#        __typename
+#    }
+#    sellingType
+#    __typename
+#}
+#
+#fragment ConversionAndFavoriteBlockProductFragment on Product {
+#    id
+#    company_id
+#    discountedPrice
+#    price
+#    priceCurrencyLocalized
+#    image(width: 200, height: 200)
+#    name: nameForCatalog
+#    signed_id
+#    buyButtonDisplayType
+#    report_start_chat_url
+#    company {
+#        id
+#        isChatVisible
+#        __typename
+#    }
+#    ...FavoriteButtonFragment
+#    __typename
+#}
+#
+#fragment FavoriteButtonFragment on Product {
+#    id
+#    name: nameForCatalog
+#    discountedAmount
+#    price
+#    company_id
+#    categoryIds
+#    priceCurrency
+#    discountedPrice
+#    __typename
+#}
+#
+#fragment ProductTileCompanyDetailsFragment on Company {
+#    id
+#    name
+#    slug
+#    regionName
+#    countryName
+#    ...CompanyRatingFragment
+#    __typename
+#}
+#
+#fragment CompanyRatingFragment on Company {
+#    id
+#    inTopSegment
+#    opinionStats {
+#        id
+#        opinionPositivePercent
+#        opinionTotal
+#        __typename
+#    }
+#    __typename
+#}
+#
+#fragment TrackProductsLoadFragment on ProductItem {
+#    product_item_id
+#    product {
+#        id
+#        name: nameForCatalog
+#        mainImageId
+#        groupId
+#        productTypeKey
+#        categoryIds
+#        priceOriginal
+#        discountedPrice
+#        discountDays
+#        isWholesale
+#        measureUnit
+#        oioCategories
+#        priceCurrency
+#        priceUSD
+#        price
+#        categoryId
+#        company {
+#            id
+#            name
+#            opinionStats {
+#                id
+#                opinionPositivePercent
+#                __typename
+#            }
+#            segment
+#            deliveryStats {
+#                id
+#                deliverySpeed
+#                __typename
+#            }
+#            __typename
+#        }
+#        labels {
+#            isEvoPayEnabled
+#            __typename
+#        }
+#        presence {
+#            isAvailable
+#            presence
+#            isPresenceSure
+#            isOrderable
+#            isUnknown
+#            __typename
+#        }
+#        deliveryDate(toRegionId: $regionId) {
+#            days
+#            __typename
+#        }
+#        __typename
+#    }
+#    __typename
+#}

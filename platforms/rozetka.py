@@ -4,8 +4,6 @@ import time
 
 import requests
 
-timeout = 30
-
 platform_name = 'rozetka'
 url = 'https://search.rozetka.com.ua/ua/search/api/v6/'
 params = {'country': 'UA', 'lang': 'ua'}
@@ -13,12 +11,12 @@ params = {'country': 'UA', 'lang': 'ua'}
 log_dir = 'platforms/fetched/rozetka/'
 
 
-def fetch_data(query: str) -> dict:
+def search_query(query: str, timeout: int = 30) -> dict:
     print('Fetching data from', platform_name)
     print('Query:', query)
 
     params['text'] = query
-    result_data = {'goods': [], 'timestamp': time.time()}
+    result_data = {'products': [], 'timestamp': time.time()}
     current_page = 1
 
     timer = time.time()
@@ -42,16 +40,16 @@ def fetch_data(query: str) -> dict:
 
         # Process the JSON data
         data = data['data']
-        goods = data['goods']
-        print('goods count:', len(goods))
-        for good in goods:
-            result_data['goods'].append({
-                'id': good['id'],
-                'name': good['title'],
-                'href': good['href'],
-                'img_href': good['image_main'],
-                'brand': good['brand'],
-                'price': good['price'],
+        products = data['goods']
+        print('products count:', len(products))
+        for product in products:
+            result_data['products'].append({
+                'id': product['id'],
+                'name': product['title'],
+                'href': product['href'],
+                'img_href': product['image_main'],
+                'brand': product['brand'],
+                'price': product['price'],
             })
 
         if current_page >= data['pagination']['total_pages']:

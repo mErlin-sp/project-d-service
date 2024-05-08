@@ -65,13 +65,15 @@ class DB:
                 CREATE TABLE IF NOT EXISTS goods (
                     id INT PRIMARY KEY AUTO_INCREMENT,
                     platform VARCHAR(255) NOT NULL,
-                    platform_id INT NOT NULL,
+                    platform_id BIGINT UNSIGNED NOT NULL,
                     query_id INT NOT NULL,
-                    name VARCHAR(255) NOT NULL,
-                    href VARCHAR(255) NOT NULL,
-                    img_href VARCHAR(255),
+                    name VARCHAR(512) NOT NULL,
+                    href VARCHAR(2048) NOT NULL,
+                    img_href VARCHAR(2048),
                     brand VARCHAR(255),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    last_confirmed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (query_id) REFERENCES tracked_queries(id)
                 );
             ''')

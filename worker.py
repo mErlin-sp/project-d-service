@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from datetime import datetime, timezone
 from importlib.util import spec_from_file_location, module_from_spec
 from types import ModuleType
 
@@ -36,7 +37,7 @@ def list_platforms(platforms_dir: str) -> (str, ModuleType):
                     platform = platform_file[:-3]  # Remove .py extension
                     module = load_platform(os.path.join(platforms_dir, platform_file))
 
-                    if hasattr(module, 'fetch_data') and callable(module.fetch_data):
+                    if hasattr(module, 'search_query') and callable(module.search_query):
                         if hasattr(module, 'ready') and not module.ready:
                             print('Platform', platform, 'is not ready')
                             continue
@@ -57,22 +58,32 @@ def list_platforms(platforms_dir: str) -> (str, ModuleType):
 
 def update_db_with_fetch_data(db: DB, data: dict, platform: str, query_id: int):
     print('Updating DB with fetched data...')
+    print('Products count:', len(data['products']))
 
     try:
-        for good in data['goods']:
-            good_id = db.execute_query('SELECT id FROM goods WHERE platform_id = %s AND query_id = %s',
-                                       (good['id'], query_id))
-            if not good_id:
-                print('Inserting good:', good['name'])
-                good_id = db.execute_query(
-                    'INSERT INTO goods (platform,platform_id, query_id, name, href, img_href, brand) VALUES (%s,%s, '
-                    '%s, %s, %s, %s, %s)',
-                    (platform, good['id'], query_id, good['name'], good['href'], good['img_href'], good['brand']), True)
-            else:
-                good_id = good_id[0][0]
+        for good in data['products']:
+            try:
+                good_id = db.execute_query('SELECT id FROM goods WHERE platform_id = %s AND query_id = %s',
+                                           (good['id'], query_id))
+                if not good_id:
+                    print('Inserting good:', good['name'])
+                    good_id = db.execute_query(
+                        'INSERT INTO goods (platform,platform_id, query_id, name, href, img_href, brand) VALUES (%s,%s,'
+                        '%s, %s, %s, %s, %s)',
+                        (platform, good['id'], query_id, good['name'], good['href'], good['img_href'], good['brand']),
+                        True)
+                else:
+                    good_id = good_id[0][0]
 
-            # Add the price to the prices table
-            db.execute_query('INSERT INTO prices (good_id, price) VALUES (%s, %s)', (good_id, good['price']))
+                # Add the price to the prices table
+                print('Inserting price', good['price'], 'for good', good['name'])
+                db.execute_query('INSERT INTO prices (good_id, price) VALUES (%s, %s)', (good_id, good['price']))
+                # Update the last_confirmed field in the goods table
+                db.execute_query('UPDATE goods SET last_confirmed = %s WHERE id = %s',
+                                 (datetime.fromtimestamp(data['timestamp'], tz=timezone.utc), good_id,))
+            except Exception as e:
+                print('Insert good error:', e)
+                continue
 
     except Exception as e:
         print('Update db with fetched data error:', e)
@@ -98,7 +109,7 @@ def update_db(db: DB, platforms_dir: str, log_dir: str = None):
     for platform, module in platforms:
         for query_id, query in queries:
             try:
-                data = module.fetch_data(query)
+                data = module.search_query(query)
                 if log_dir:
                     try:
                         path = os.path.join(log_dir, platform)
@@ -109,6 +120,9 @@ def update_db(db: DB, platforms_dir: str, log_dir: str = None):
                         print('Failed to save fetched data:', e)
 
                 update_db_with_fetch_data(db, data, platform, query_id)
+
+                print('--' * 50)
+                print('')
             except Exception as e:
                 print('Update DB for platform', platform, 'query', query, 'error:', e)
 
