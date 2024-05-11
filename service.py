@@ -1,3 +1,4 @@
+import os
 import time
 from threading import Thread
 
@@ -10,8 +11,8 @@ import worker
 from db import DB
 
 # DB connection parameters
-db_host: str = '127.0.0.1'
-db_port: int = 3306
+db_host: str = os.getenv('MYSQL_ADDR', '127.0.0.1')
+db_port: int = int(os.getenv('MYSQL_PORT', 3306))
 db_user: str = 'root'
 db_password: str = 'qwertyuiop'
 db_database: str = 'project-d-db'
@@ -20,8 +21,8 @@ db_database: str = 'project-d-db'
 db = DB(db_host, db_port, db_user, db_password, db_database)
 
 # API parameters
-api_host: str = '127.0.0.1'
-api_port: int = 8000
+api_host: str = os.getenv('API_ADDR', '127.0.0.1')
+api_port: int = int(os.getenv('API_PORT', 8000))
 
 # Initialize FastAPI
 api = FastAPI()
