@@ -4,6 +4,7 @@ from threading import Thread
 import schedule
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 import worker
 from db import DB
@@ -25,6 +26,14 @@ api_port: int = 8000
 # Initialize FastAPI
 api = FastAPI()
 
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 platforms_dir = 'platforms/'
 
 
@@ -40,7 +49,7 @@ async def say_hello(name: str):
 
 @api.get("/db/queries")
 async def get_queries():
-    return {"rows": db.get_queries()}
+    return db.get_queries()
 
 
 @api.get("/db/queries/active")
@@ -75,7 +84,7 @@ if __name__ == '__main__':
 
     try:
         # Run the scheduler
-        schedule.run_all()
+        # schedule.run_all()
         while True:
             schedule.run_pending()
             time.sleep(1)  # Sleep for 1 second to avoid high CPU usage
