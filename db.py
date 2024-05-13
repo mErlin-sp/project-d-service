@@ -1,3 +1,5 @@
+import threading
+
 import mysql.connector
 
 
@@ -10,6 +12,9 @@ class DB:
         self.user = user
         self.password = password
         self.database = database
+
+        # Create a lock
+        self.lock = threading.Lock()
 
     def __del__(self):
         if self.cnx is not None:
@@ -104,60 +109,99 @@ class DB:
             cur.close()
 
     def get_queries(self):
-        try:
-            # Get a cursor
-            cur = self.cnx.cursor()
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
 
-            # Execute a query
-            cur.execute('SELECT * FROM tracked_queries')
+                # Execute a query
+                cur.execute('SELECT * FROM tracked_queries')
 
-            # Fetch all results
-            rows = cur.fetchall()
-            cur.close()
-            return rows
+                # Fetch all results
+                rows = cur.fetchall()
+                cur.close()
+                return rows
 
-        except mysql.connector.Error as e:
-            print('Get Queries Error:', e)
-            return []
+            except mysql.connector.Error as e:
+                print('Get Queries Error:', e)
+                return []
 
     def get_active_queries(self):
-        try:
-            # Get a cursor
-            cur = self.cnx.cursor()
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
 
-            # Execute a query
-            cur.execute('SELECT id,query FROM tracked_queries WHERE active = TRUE')
+                # Execute a query
+                cur.execute('SELECT id,query FROM tracked_queries WHERE active = TRUE')
 
-            # Fetch all results
-            rows = cur.fetchall()
-            cur.close()
+                # Fetch all results
+                rows = cur.fetchall()
+                cur.close()
 
-            return rows
-        except mysql.connector.Error as e:
-            print('Get Queries Error:', e)
-            return []
+                return rows
+            except mysql.connector.Error as e:
+                print('Get Queries Error:', e)
+                return []
+
+    def set_query_status(self, query_id: int, active: bool):
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                cur.execute('UPDATE tracked_queries SET active = %s WHERE id = %s', (active, query_id))
+
+                # Make sure data is committed to the database
+                self.cnx.commit()
+
+                cur.close()
+            except mysql.connector.Error as e:
+                print('Set Query Status Error:', e)
+
+    def add_query(self, query: str):
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                cur.execute('INSERT INTO tracked_queries (query) VALUES (%s)', (query,))
+
+                # Make sure data is committed to the database
+                self.cnx.commit()
+
+                return cur.lastrowid
+            except mysql.connector.Error as e:
+                print('Add Query Error:', e)
+                return -1
+            finally:
+                cur.close()
 
     def execute_query(self, query: str, _kwargs=None, last_row_id=False):
         if _kwargs is None:
             _kwargs = []
-        try:
-            # Get a cursor
-            cur = self.cnx.cursor()
 
-            # Execute a query
-            cur.execute(query, _kwargs)
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
 
-            if last_row_id:
-                return cur.lastrowid
+                # Execute a query
+                cur.execute(query, _kwargs)
 
-            return cur.fetchall()
+                if last_row_id:
+                    return cur.lastrowid
 
-        except mysql.connector.Error as e:
-            print('Execute Query Error:', e)
-            raise e
-        finally:
-            # Make sure data is committed to the database
-            self.cnx.commit()
+                return cur.fetchall()
+
+            except mysql.connector.Error as e:
+                print('Execute Query Error:', e)
+                raise e
+            finally:
+                # Make sure data is committed to the database
+                self.cnx.commit()
 
     def db_close(self):
         try:

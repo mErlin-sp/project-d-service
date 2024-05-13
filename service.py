@@ -40,12 +40,12 @@ platforms_dir = 'platforms/'
 
 @api.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Service is running..."}
 
 
-@api.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@api.get("/test/{message}")
+async def test_api(message: str):
+    return {"message": message}
 
 
 @api.get("/db/queries")
@@ -56,6 +56,22 @@ async def get_queries():
 @api.get("/db/queries/active")
 async def get_active_queries():
     return {"rows": db.get_active_queries()}
+
+
+@api.get("/db/query/{query_id}/active/{active}")
+async def set_query_status(query_id: int, active: bool):
+    db.set_query_status(query_id, active)
+    return {'status': 'ok', 'query_id': query_id, 'active': active}
+
+
+@api.get("/db/queries/add-query/{query}")
+async def add_query(query: str):
+    return {'status': 'ok', 'query': query, 'query_id': db.add_query(query)}
+
+
+@api.get("/platforms")
+async def get_platforms():
+    return [platform[0] for platform in worker.list_platforms(platforms_dir)]
 
 
 def run_api():
