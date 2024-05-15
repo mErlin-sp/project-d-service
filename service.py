@@ -13,9 +13,9 @@ from db import DB
 # DB connection parameters
 db_host: str = os.getenv('MYSQL_ADDR', '127.0.0.1')
 db_port: int = int(os.getenv('MYSQL_PORT', 3306))
-db_user: str = 'root'
-db_password: str = 'qwertyuiop'
-db_database: str = 'project-d-db'
+db_user: str = os.getenv('MYSQL_USER', 'root')
+db_password: str = os.getenv('MYSQL_PASSWORD', 'qwertyuiop')
+db_database: str = os.getenv('MYSQL_DB', 'project-d-db')
 
 # Initialize DB
 db = DB(db_host, db_port, db_user, db_password, db_database)
@@ -75,6 +75,10 @@ async def get_platforms():
 
 
 def run_api():
+    print('Running API...')
+    print('API Host:', api_host)
+    print('API Port:', api_port)
+    print('')
     uvicorn.run(api, host=api_host, port=api_port)
     print('API is running...')
 

@@ -13,6 +13,13 @@ class DB:
         self.password = password
         self.database = database
 
+        print('DB Connection parameters:')
+        print('Host:', self.host)
+        print('Port:', self.port)
+        print('User:', self.user)
+        print('DB:', self.database)
+        print('')
+
         # Create a lock
         self.lock = threading.Lock()
 
