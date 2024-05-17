@@ -24,7 +24,7 @@
             </DockerPortBindingImpl>
           </list>
         </option>
-        <option name="commandLineOptions" value="--network=project-d-net" />
+        <option name="commandLineOptions" value="--network=project-d-net --restart=always" />
         <option name="showCommandPreview" value="true" />
         <option name="sourceFilePath" value="Dockerfile" />
       </settings>
