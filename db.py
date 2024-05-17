@@ -216,3 +216,39 @@ class DB:
             print('DB Connection closed')
         except mysql.connector.Error as e:
             print('DB Close Error:', e)
+
+    def get_goods(self):
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                cur.execute('SELECT * FROM goods')
+
+                # Fetch all results
+                rows = cur.fetchall()
+                cur.close()
+                return rows
+
+            except mysql.connector.Error as e:
+                print('Get Goods Error:', e)
+                return []
+
+    def get_prices(self, good_id: int):
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                cur.execute('SELECT price,timestamp FROM prices WHERE good_id = %s', (good_id,))
+
+                # Fetch all results
+                rows = cur.fetchall()
+                cur.close()
+                return rows
+
+            except mysql.connector.Error as e:
+                print('Get Prices Error:', e)
+                return []

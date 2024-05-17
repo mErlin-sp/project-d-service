@@ -74,6 +74,16 @@ async def get_platforms():
     return [platform[0] for platform in worker.list_platforms(platforms_dir)]
 
 
+@api.get("/db/goods")
+async def get_goods():
+    return db.get_goods()
+
+
+@api.get("/db/prices/{good_id}")
+async def get_prices(good_id: int):
+    return db.get_prices(good_id)
+
+
 def run_api():
     print('Running API...')
     print('API Host:', api_host)
