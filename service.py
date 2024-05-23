@@ -84,6 +84,11 @@ async def get_prices(good_id: int):
     return db.get_prices(good_id)
 
 
+@api.get("/db/in-stock/{good_id}")
+async def get_in_stock(good_id: int):
+    return db.get_in_stock(good_id)
+
+
 def run_api():
     print('Running API...')
     print('API Host:', api_host)
@@ -115,7 +120,7 @@ if __name__ == '__main__':
 
     try:
         # Run the scheduler
-        # schedule.run_all()
+        schedule.run_all()
         while True:
             schedule.run_pending()
             time.sleep(1)  # Sleep for 1 second to avoid high CPU usage

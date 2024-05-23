@@ -88,6 +88,7 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
                 'img_href': product['photos'][0]['link'] if product['photos'] else None,
                 'brand': None,
                 'price': price,
+                'in_stock': True,
             })
 
         print('done')
@@ -96,6 +97,5 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
 
     print('Fetching data from', platform_name, 'done')
     return result_data
-
 
 # print(search_query('Чехол Iphone 15'))

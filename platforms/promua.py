@@ -86,6 +86,7 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
                 'img_href': product['image'],
                 'brand': product['manufacturer'],
                 'price': product['price'],
+                'in_stock': product['presence'] and product['presence']['isAvailable']
             })
 
         print('done')

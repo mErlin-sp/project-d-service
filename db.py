@@ -103,6 +103,17 @@ class DB:
             ''')
             print('prices table created')
 
+            # Create in_stock table
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS in_stock (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    good_id INT NOT NULL,
+                    in_stock BOOLEAN DEFAULT FALSE,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (good_id) REFERENCES goods(id)
+                );
+            ''')
+
             # Make sure data is committed to the database
             self.cnx.commit()
 
@@ -251,4 +262,22 @@ class DB:
 
             except mysql.connector.Error as e:
                 print('Get Prices Error:', e)
+                return []
+
+    def get_in_stock(self, good_id: int):
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                cur.execute('SELECT in_stock,timestamp FROM in_stock WHERE good_id = %s', (good_id,))
+
+                # Fetch all results
+                rows = cur.fetchall()
+                cur.close()
+                return rows
+
+            except mysql.connector.Error as e:
+                print('Get In Stock Error:', e)
                 return []

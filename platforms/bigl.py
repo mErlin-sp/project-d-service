@@ -86,6 +86,7 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
                 'img_href': product['main_image']['url'] if 'main_image' in product else None,
                 'brand': product['manufacturerInfo']['name'] if 'manufacturerInfo' in product else None,
                 'price': product['price'],
+                'in_stock': product['presence'] and product['presence'] == 'avail'
             })
 
         print('done')

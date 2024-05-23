@@ -61,36 +61,36 @@ fragment ProductsListFragment on ListingPage {
     mainEntityMatch
     notEnoughProducts
     attributesMatch
-#    topHitsCategory {
-#        id
-#        path {
-#            id
-#            caption
-#            __typename
-#        }
-#        __typename
-#    }
+    #    topHitsCategory {
+    #        id
+    #        path {
+    #            id
+    #            caption
+    #            __typename
+    #        }
+    #        __typename
+    #    }
     products {
         ...ProductsItemFragment
         __typename
     }
-#    productsBadMatch {
-#        ...ProductsItemFragment
-#        __typename
-#    }
+    #    productsBadMatch {
+    #        ...ProductsItemFragment
+    #        __typename
+    #    }
     companyIds
-#    quickFilters {
-#        name
-#        title
-#        measureUnit
-#        values {
-#            value
-#            title
-#            imageUrl(width: 200, height: 200)
-#            __typename
-#        }
-#        __typename
-#    }
+    #    quickFilters {
+    #        name
+    #        title
+    #        measureUnit
+    #        values {
+    #            value
+    #            title
+    #            imageUrl(width: 200, height: 200)
+    #            __typename
+    #        }
+    #        __typename
+    #    }
     __typename
 }
 
@@ -113,6 +113,9 @@ fragment ProductFragment on Product{
     name
     price
     priceCurrency
+    presence {
+        isAvailable
+    }
     isService
     groupId
     categoryId

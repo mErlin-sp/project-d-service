@@ -50,6 +50,7 @@ def search_query(query: str, timeout: int = 30) -> dict:
                 'img_href': product['image_main'],
                 'brand': product['brand'],
                 'price': product['price'],
+                'in_stock': product['status'] and product['status'] == 'available'
             })
 
         if current_page >= data['pagination']['total_pages']:
