@@ -19,8 +19,8 @@ log_dir = f'platforms/fetched/{platform_name}/'
 
 
 def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: bool = False) -> dict:
-    print('Fetching data from OLX')
-    print('Query:', query)
+    print('[OLX] Fetching data from OLX')
+    print('[OLX] Query:', query)
 
     params['query'] = query
 
@@ -32,16 +32,16 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: boo
     while True:
 
         if time.time() - timer >= timeout:
-            print('Timeout reached')
+            print('[OLX] Timeout reached')
             raise Exception('Timeout reached')
 
-        print('offset:', offset)
+        print('[OLX] offset:', offset)
         params['offset'] = offset
 
         response = requests.get(url, params=params)
         if response.status_code != 200:
             if response.json()['error']['title'] == 'Invalid request':
-                print('Invalid request. Maybe reached the end?')
+                print('[OLX] Invalid request. Maybe reached the end?')
                 return result_data
 
             raise Exception('Failed to fetch data:', response.status_code, response.text)
@@ -61,25 +61,25 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: boo
         if not products:
             break
 
-        print('fetched:', len(products))
+        print('[OLX] fetched:', len(products))
 
         for product in products:
             if max_products and len(result_data['products']) >= max_products:
-                print('Max products reached')
+                print('[OLX] Max products reached')
                 return result_data
 
             product_params = product['params']
             price = None
             try:
-                # print('params:', product_params)
+                # print('[OLX] params:', product_params)
                 price_param_index = next(
                     (i for i, item in enumerate(product_params) if
                      item.get('key') == 'price' and item.get('type') == 'price'), None)
                 if price_param_index is not None:
                     price = product_params[price_param_index]['value']['value']
-                # print('price:', price)
+                # print('[OLX] price:', price)
             except Exception as e:
-                print('Price extraction error:', e)
+                print('[OLX] Price extraction error:', e)
 
             result_data['products'].append({
                 'id': product['id'],
@@ -91,11 +91,11 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: boo
                 'in_stock': True,
             })
 
-        print('done')
+        print('[OLX] done')
         offset += limit
         time.sleep(delay)
 
-    print('Fetching data from', platform_name, 'done')
+    print('[OLX] Fetching data from', platform_name, 'done')
     return result_data
 
 # print(search_query('Чехол Iphone 15'))

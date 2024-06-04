@@ -86,9 +86,18 @@ def export_to_xlsx(db: DB, query: str = None, file_name: str = 'export.xlsx',
             row += 1
             for good in goods:
                 worksheet.write_row(row, col, good[:-3])
-                worksheet.write_datetime(row, col + 8, datetime.strptime(good[-3], '%Y-%m-%d %H:%M:%S'), date_format)
-                worksheet.write_datetime(row, col + 9, datetime.strptime(good[-2], '%Y-%m-%d %H:%M:%S'), date_format)
-                worksheet.write_datetime(row, col + 10, datetime.strptime(good[-1], '%Y-%m-%d %H:%M:%S'), date_format)
+                worksheet.write_datetime(row, col + 8,
+                                         good[-3] if isinstance(good[-3], datetime) else datetime.strptime(good[-3],
+                                                                                                           '%Y-%m-%d %H:%M:%S'),
+                                         date_format)
+                worksheet.write_datetime(row, col + 9,
+                                         good[-2] if isinstance(good[-2], datetime) else datetime.strptime(good[-2],
+                                                                                                           '%Y-%m-%d %H:%M:%S'),
+                                         date_format)
+                worksheet.write_datetime(row, col + 10,
+                                         good[-1] if isinstance(good[-1], datetime) else datetime.strptime(good[-1],
+                                                                                                           '%Y-%m-%d %H:%M:%S'),
+                                         date_format)
                 row += 1
 
             # Set the auto filter.

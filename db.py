@@ -307,7 +307,6 @@ class MySQLDB(DB):
         print('Host:', self.host)
         print('Port:', self.port)
         print('User:', self.user)
-        print('DB:', self.database)
         print('')
 
         try:
@@ -317,9 +316,9 @@ class MySQLDB(DB):
                 port=self.port,
                 user=self.user,
                 password=self.password,
-                database=self.database)
+                database=database)
 
-            if not self.cnx.is_connected():
+            if not cnx.is_connected():
                 raise mysql.connector.Error('Failed to connect to MySQL server.')
 
             print('Connected to MySQL server.')

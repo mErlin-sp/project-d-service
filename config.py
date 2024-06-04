@@ -9,7 +9,7 @@ def create_default_config(config_file: str = 'config.ini'):
     config = configparser.ConfigParser()
 
     # Add sections and key-value pairs
-    config['DEFAULT']['UpdateInterval'] = '5'  # Update interval in minutes
+    config['DEFAULT']['UpdateInterval'] = '30'  # Update interval in minutes
 
     # Write the INI file
     with open(config_file, 'w') as configfile:

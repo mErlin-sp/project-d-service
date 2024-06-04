@@ -84,7 +84,7 @@ def update_db_with_fetch_data(db: DB, data: dict, platform: str, query_id: int):
                     '''INSERT INTO prices (good_id, price) VALUES ('{}', '{}')'''.format(good_id, good['price']))
                 # Add the stock status to the in_stock table
                 print('Inserting stock status', good['in_stock'], 'for good', good['name'])
-                db.execute_query('''INSERT INTO in_stock (good_id, in_stock) VALUES ('{}', '{}')'''.format(good_id,
+                db.execute_query('''INSERT INTO in_stock (good_id, in_stock) VALUES ('{}', {})'''.format(good_id,
                                                                                                            good[
                                                                                                                'in_stock']))
                 # Update the last_confirmed field in the goods table

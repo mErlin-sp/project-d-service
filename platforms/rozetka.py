@@ -11,9 +11,9 @@ params = {'country': 'UA', 'lang': 'ua'}
 log_dir = f'platforms/fetched/{platform_name}/'
 
 
-def search_query(query: str, timeout: int = 30, logging:bool=False) -> dict:
-    print('Fetching data from', platform_name)
-    print('Query:', query)
+def search_query(query: str, timeout: int = 30, logging: bool = False) -> dict:
+    print('[ROZETKA] Fetching data from', platform_name)
+    print('[ROZETKA] Query:', query)
 
     params['text'] = query
     result_data = {'products': [], 'timestamp': time.time()}
@@ -22,7 +22,7 @@ def search_query(query: str, timeout: int = 30, logging:bool=False) -> dict:
     timer = time.time()
 
     while True:
-        print('page:', current_page)
+        print('[ROZETKA] page:', current_page)
         params['page'] = current_page
 
         response = requests.get(url, params=params)
@@ -41,7 +41,7 @@ def search_query(query: str, timeout: int = 30, logging:bool=False) -> dict:
         # Process the JSON data
         data = data['data']
         products = data['goods']
-        print('products count:', len(products))
+        print('[ROZETKA] products count:', len(products))
         for product in products:
             result_data['products'].append({
                 'id': product['id'],
@@ -57,11 +57,11 @@ def search_query(query: str, timeout: int = 30, logging:bool=False) -> dict:
             break
 
         if time.time() - timer >= timeout:
-            print('Timeout reached')
+            print('[ROZETKA] Timeout reached')
             raise Exception('Timeout reached')
 
-        print('fetch page done')
+        print('[ROZETKA] fetch page done')
         current_page += 1
 
-    print('Fetching data from', platform_name, 'done')
+    print('[ROZETKA] Fetching data from', platform_name, 'done')
     return result_data

@@ -21,8 +21,8 @@ log_dir = f'platforms/fetched/{platform_name}/'
 
 
 def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: bool = False) -> dict:
-    print('Fetching data from PromUA')
-    print('Query:', query)
+    print('[PROM.UA] Fetching data from PromUA')
+    print('[PROM.UA] Query:', query)
 
     params['search_term'] = query
 
@@ -50,10 +50,10 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: boo
     while True:
 
         if time.time() - timer >= timeout:
-            print('Timeout reached')
+            print('[PROM.UA] Timeout reached')
             raise Exception('Timeout reached')
 
-        print('offset:', offset)
+        print('[PROM.UA] offset:', offset)
         params['offset'] = offset
 
         data = client.execute(gql_query, variable_values=params)
@@ -70,13 +70,13 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: boo
         if not products:
             break
 
-        print('fetched:', len(products))
+        print('[PROM.UA] fetched:', len(products))
 
         for _ in products:
             product = _['product']
 
             if max_products and len(result_data['products']) >= max_products:
-                print('Max products reached')
+                print('[PROM.UA] Max products reached')
                 return result_data
 
             result_data['products'].append({
@@ -89,11 +89,11 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: boo
                 'in_stock': product['presence'] and product['presence']['isAvailable']
             })
 
-        print('done')
+        print('[PROM.UA] done')
         offset += limit
         time.sleep(delay)
 
-    print('Fetching data from', platform_name, 'done')
+    print('[PROM.UA] Fetching data from', platform_name, 'done')
     return result_data
 
 # print(search_query('Чохол для iPhone 12 Pro Max'))
