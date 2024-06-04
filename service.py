@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import time
 from threading import Thread
 
@@ -157,6 +158,15 @@ async def export_sqlite_db():
         return {'status': 'error', 'message': 'DB_TYPE is not sqlite'}
 
 
+@api.get("/restart-service")
+async def restart_service():
+    try:
+        print('Restarting service...')
+        os._exit(0)
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
+
+
 def run_api():
     print('Running API...')
     print('API Host:', api_host)
@@ -194,10 +204,10 @@ if __name__ == '__main__':
     print('')
 
     try:
-        if debug:
-            print('Running the scheduler...')
-            # Run the scheduler
-            schedule.run_all()
+        # if debug:
+        #     print('Running the scheduler...')
+        #     # Run the scheduler
+        #     schedule.run_all()
         while True:
             schedule.run_pending()
             time.sleep(1)  # Sleep for 1 second to avoid high CPU usage
