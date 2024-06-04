@@ -89,7 +89,8 @@ def update_db_with_fetch_data(db: DB, data: dict, platform: str, query_id: int):
                                                                                                                'in_stock']))
                 # Update the last_confirmed field in the goods table
                 db.execute_query('''UPDATE goods SET last_confirmed = '{}' WHERE id = '{}' '''.format(
-                    datetime.fromtimestamp(data['timestamp'], tz=timezone.utc), good_id, ))
+                    datetime.fromtimestamp(data['timestamp'], tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'),
+                    good_id, ))
             except Exception as e:
                 print('Insert good error:', e)
                 continue

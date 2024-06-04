@@ -337,7 +337,7 @@ class SqLiteDB(DB):
         print('SQLite DB')
         print('DB Connection parameters:')
         print('DB:', db_name)
-        print('Dir:', db_dir)
+        print('DB Dir:', db_dir)
         print('')
 
         try:

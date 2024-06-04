@@ -6,9 +6,13 @@ import schedule
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import FileResponse
 
+import exporter
 import worker
-from db import DB, SqLiteDB
+from db import SqLiteDB, MySQLDB
+
+debug: bool = os.getenv('DEBUG', 'false').lower() == 'true'
 
 update_interval: int = 5  # Update interval in minutes
 db_type: str = os.getenv('DB_TYPE', 'sqlite')
@@ -26,7 +30,7 @@ elif db_type == 'mysql':
     db_database: str = os.getenv('MYSQL_DB', 'project-d-db')
 
     # Initialize DB
-    db = DB(db_host, db_port, db_user, db_password, db_database)
+    db = MySQLDB(db_host, db_port, db_user, db_password, db_database)
 else:
     print('Invalid DB_TYPE:', db_type)
     exit(0)
@@ -38,13 +42,15 @@ api_port: int = int(os.getenv('API_PORT', 8000))
 # Initialize FastAPI
 api = FastAPI()
 
-api.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if debug:
+    print('Adding CORS middleware...')
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 platforms_dir = 'platforms/'
 
@@ -54,9 +60,15 @@ async def root():
     return {"message": "Service is running..."}
 
 
-@api.get("/test/{message}")
-async def test_api(message: str):
-    return {"message": message}
+if debug:
+    @api.get("/test/{message}")
+    async def test_api(message: str):
+        return {"message": message}
+
+
+@api.get("/db/type")
+async def get_db_type():
+    return {'db_type': db_type}
 
 
 @api.get("/db/queries")
@@ -112,6 +124,38 @@ async def set_update_interval(interval: int):
     return {'update_interval': update_interval}
 
 
+@api.get("/export/csv")
+async def export_to_csv():
+    file_name = f'export-{time.strftime("%Y-%m-%d %H-%M-%S")}.csv'
+    exported = exporter.export_to_csv(db, file_name=file_name, file_path='export/')
+    if exported:
+        return FileResponse(exported, media_type='text/csv', filename=file_name)
+    else:
+        return {'status': 'error', 'message': 'Export to CSV failed'}
+
+
+@api.get("/export/xlsx")
+async def export_to_xlsx():
+    file_name = f'export-{time.strftime("%Y-%m-%d %H-%M-%S")}.xlsx'
+    exported = exporter.export_to_xlsx(db, file_name=file_name, file_path='export/')
+    if exported:
+        return FileResponse(exported, media_type='application/vnd.ms-excel',
+                            filename=file_name)
+    else:
+        return {'status': 'error', 'message': 'Export to XLSX failed'}
+
+
+@api.get("/export/sqlite-db")
+async def export_sqlite_db():
+    if db_type == 'sqlite':
+        db_file = os.path.join(db_dir, db_name)
+        if not os.path.exists(db_file):
+            return {'status': 'error', 'message': 'DB file not found'}
+        return FileResponse(db_file, media_type='application/x-sqlite3', filename=db_name)
+    else:
+        return {'status': 'error', 'message': 'DB_TYPE is not sqlite'}
+
+
 def run_api():
     print('Running API...')
     print('API Host:', api_host)
@@ -125,6 +169,11 @@ def init():
     print('project-d service is initializing...')
     db.db_init()
     print('project-d service is initialized.')
+
+    # # Export the DB to CSV and XLSX. Test
+    # exporter.export_to_csv(db, file_name='export.csv', file_path='export/')
+    # exporter.export_to_xlsx(db, file_name='export.xlsx', file_path='export/')
+    # exit(0)
 
 
 if __name__ == '__main__':
@@ -143,7 +192,7 @@ if __name__ == '__main__':
 
     try:
         # Run the scheduler
-        schedule.run_all()
+        # schedule.run_all()
         while True:
             schedule.run_pending()
             time.sleep(1)  # Sleep for 1 second to avoid high CPU usage

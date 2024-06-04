@@ -5,3 +5,5 @@ schedule~=1.2.1
 uvicorn~=0.29.0
 fastapi~=0.110.2
 requests-toolbelt~=1.0.0
+XlsxWriter~=3.2.0
+starlette~=0.37.2
