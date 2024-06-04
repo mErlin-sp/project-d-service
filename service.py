@@ -8,13 +8,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse
 
+import config
 import exporter
 import worker
 from db import SqLiteDB, MySQLDB
 
 debug: bool = os.getenv('DEBUG', 'false').lower() == 'true'
+config_file: str = os.getenv('CONFIG_FILE', 'config.ini')
 
-update_interval: int = 5  # Update interval in minutes
 db_type: str = os.getenv('DB_TYPE', 'sqlite')
 
 if db_type == 'sqlite':
@@ -114,14 +115,13 @@ async def get_in_stock(good_id: int):
 
 @api.get("/settings/update-interval")
 async def get_update_interval():
-    return {'update_interval': update_interval}
+    return {'update_interval': config.read_config_value('UpdateInterval')}
 
 
 @api.get("/settings/update-interval/{interval}")
 async def set_update_interval(interval: int):
-    global update_interval
-    update_interval = interval
-    return {'update_interval': update_interval}
+    config.write_config_value('UpdateInterval', str(interval))
+    return {'update_interval': config.read_config_value('UpdateInterval')}
 
 
 @api.get("/export/csv")
@@ -185,8 +185,8 @@ if __name__ == '__main__':
     api_thread.start()
 
     # Schedule the job to run every minute
-    schedule.every(update_interval).minutes.do(worker.update_db, db, platforms_dir)
-    print('DB update scheduled.')
+    schedule.every(int(config.read_config_value('UpdateInterval'))).minutes.do(worker.update_db, db, platforms_dir)
+    print('DB update scheduled. Interval:', config.read_config_value('UpdateInterval'), 'minutes')
     print('--' * 50)
     print('')
 
