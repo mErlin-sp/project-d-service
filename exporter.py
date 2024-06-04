@@ -54,7 +54,7 @@ def export_to_xlsx(db: DB, query: str = None, file_name: str = 'export.xlsx',
     try:
         os.makedirs(file_path, exist_ok=True)
 
-        with xlsxwriter.Workbook(os.path.join(file_path, file_name)) as workbook:
+        with xlsxwriter.Workbook(os.path.join(file_path, file_name), {'strings_to_urls': False}) as workbook:
             worksheet = workbook.add_worksheet('Goods')
 
             # Add a bold format to use to highlight cells.
@@ -71,7 +71,7 @@ def export_to_xlsx(db: DB, query: str = None, file_name: str = 'export.xlsx',
                                  'created_at', 'last_updated', 'last_confirmed'], bold)
 
             # Adjust the columns' width.
-            worksheet.set_column(col, col, 5)  # id
+            worksheet.set_column(col, col, 10)  # id
             worksheet.set_column(col + 1, col + 1, 10)  # platform
             worksheet.set_column(col + 2, col + 2, 15)  # platform_id
             worksheet.set_column(col + 3, col + 3, 15)  # query_id

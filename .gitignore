@@ -6,4 +6,5 @@ db/
 export/
 *.rar
 *.http
+*.log
 config.ini

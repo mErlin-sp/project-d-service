@@ -1,5 +1,7 @@
 import json
+import logging
 import os
+import sys
 import time
 
 import requests
@@ -9,11 +11,12 @@ url = 'https://search.rozetka.com.ua/ua/search/api/v6/'
 params = {'country': 'UA', 'lang': 'ua'}
 
 log_dir = f'platforms/fetched/{platform_name}/'
+logger = logging.getLogger(platform_name)
 
 
-def search_query(query: str, timeout: int = 30, logging: bool = False) -> dict:
-    print('[ROZETKA] Fetching data from', platform_name)
-    print('[ROZETKA] Query:', query)
+def search_query(query: str, timeout: int = 30, log_queries: bool = False) -> dict:
+    logger.info('[ROZETKA] Fetching data from ' + platform_name)
+    logger.debug('[ROZETKA] Query: ' + query)
 
     params['text'] = query
     result_data = {'products': [], 'timestamp': time.time()}
@@ -22,7 +25,7 @@ def search_query(query: str, timeout: int = 30, logging: bool = False) -> dict:
     timer = time.time()
 
     while True:
-        print('[ROZETKA] page:', current_page)
+        logger.debug('[ROZETKA] page: ' + str(current_page))
         params['page'] = current_page
 
         response = requests.get(url, params=params)
@@ -33,7 +36,7 @@ def search_query(query: str, timeout: int = 30, logging: bool = False) -> dict:
         data = response.json()
 
         # Save the response to a file
-        if log_dir and logging:
+        if log_dir and log_queries:
             os.makedirs(log_dir, exist_ok=True)
             with open(os.path.join(log_dir, f'{query}-{current_page}-{time.time()}.json'), 'w') as f:
                 json.dump(data, f, indent=2)
@@ -41,7 +44,7 @@ def search_query(query: str, timeout: int = 30, logging: bool = False) -> dict:
         # Process the JSON data
         data = data['data']
         products = data['goods']
-        print('[ROZETKA] products count:', len(products))
+        logger.debug('[ROZETKA] products count: ' + str(len(products)))
         for product in products:
             result_data['products'].append({
                 'id': product['id'],
@@ -57,11 +60,11 @@ def search_query(query: str, timeout: int = 30, logging: bool = False) -> dict:
             break
 
         if time.time() - timer >= timeout:
-            print('[ROZETKA] Timeout reached')
+            logger.warning('[ROZETKA] Timeout reached')
             raise Exception('Timeout reached')
 
-        print('[ROZETKA] fetch page done')
+        logger.debug('[ROZETKA] fetch page done')
         current_page += 1
 
-    print('[ROZETKA] Fetching data from', platform_name, 'done')
+    logger.info('[ROZETKA] Fetching data from ' + platform_name + ' done')
     return result_data

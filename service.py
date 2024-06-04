@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from threading import Thread
@@ -177,6 +178,8 @@ def init():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='debug.log', encoding='utf-8', level=logging.INFO)
+
     init()
     print('project-d service is running...')
 
