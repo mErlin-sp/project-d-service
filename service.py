@@ -8,17 +8,28 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import worker
-from db import DB
+from db import DB, SqLiteDB
 
-# DB connection parameters
-db_host: str = os.getenv('MYSQL_ADDR', '127.0.0.1')
-db_port: int = int(os.getenv('MYSQL_PORT', 3306))
-db_user: str = os.getenv('MYSQL_USER', 'root')
-db_password: str = os.getenv('MYSQL_PASSWORD', 'qwertyuiop')
-db_database: str = os.getenv('MYSQL_DB', 'project-d-db')
+update_interval: int = 5  # Update interval in minutes
+db_type: str = os.getenv('DB_TYPE', 'sqlite')
 
-# Initialize DB
-db = DB(db_host, db_port, db_user, db_password, db_database)
+if db_type == 'sqlite':
+    db_dir: str = os.getenv('DB_DIR', 'db/')
+    db_name: str = os.getenv('DB_NAME', 'project-d-db.sqlite')
+    db = SqLiteDB(db_name, db_dir)
+elif db_type == 'mysql':
+    # DB connection parameters
+    db_host: str = os.getenv('MYSQL_ADDR', '127.0.0.1')
+    db_port: int = int(os.getenv('MYSQL_PORT', 3306))
+    db_user: str = os.getenv('MYSQL_USER', 'root')
+    db_password: str = os.getenv('MYSQL_PASSWORD', 'qwertyuiop')
+    db_database: str = os.getenv('MYSQL_DB', 'project-d-db')
+
+    # Initialize DB
+    db = DB(db_host, db_port, db_user, db_password, db_database)
+else:
+    print('Invalid DB_TYPE:', db_type)
+    exit(0)
 
 # API parameters
 api_host: str = os.getenv('API_ADDR', '127.0.0.1')
@@ -89,6 +100,18 @@ async def get_in_stock(good_id: int):
     return db.get_in_stock(good_id)
 
 
+@api.get("/settings/update-interval")
+async def get_update_interval():
+    return {'update_interval': update_interval}
+
+
+@api.get("/settings/update-interval/{interval}")
+async def set_update_interval(interval: int):
+    global update_interval
+    update_interval = interval
+    return {'update_interval': update_interval}
+
+
 def run_api():
     print('Running API...')
     print('API Host:', api_host)
@@ -113,7 +136,7 @@ if __name__ == '__main__':
     api_thread.start()
 
     # Schedule the job to run every minute
-    schedule.every(5).minutes.do(worker.update_db, db, platforms_dir)
+    schedule.every(update_interval).minutes.do(worker.update_db, db, platforms_dir)
     print('DB update scheduled.')
     print('--' * 50)
     print('')

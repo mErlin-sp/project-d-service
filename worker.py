@@ -64,28 +64,32 @@ def update_db_with_fetch_data(db: DB, data: dict, platform: str, query_id: int):
     try:
         for good in data['products']:
             try:
-                good_id = db.execute_query('SELECT id FROM goods WHERE platform_id = %s AND query_id = %s',
-                                           (good['id'], query_id))
+                good_id = db.execute_query(
+                    '''SELECT id FROM goods WHERE platform_id = {} AND query_id = '{}' '''.format(good['id'], query_id))
+
                 if not good_id:
                     print('Inserting good:', good['name'])
                     good_id = db.execute_query(
-                        'INSERT INTO goods (platform,platform_id, query_id, name, href, img_href, brand) VALUES (%s,%s,'
-                        '%s, %s, %s, %s, %s)',
-                        (platform, good['id'], query_id, good['name'], good['href'], good['img_href'], good['brand']),
+                        '''INSERT INTO goods (platform,platform_id, query_id, name, href, img_href, brand) VALUES (
+                        '{}','{}', '{}', '{}', '{}', '{}', '{}')'''.format(platform, good['id'], query_id, good['name'],
+                                                                           good['href'],
+                                                                           good['img_href'], good['brand']),
                         True)
                 else:
                     good_id = good_id[0][0]
 
                 # Add the price to the prices table
                 print('Inserting price', good['price'], 'for good', good['name'])
-                db.execute_query('INSERT INTO prices (good_id, price) VALUES (%s, %s)', (good_id, good['price']))
+                db.execute_query(
+                    '''INSERT INTO prices (good_id, price) VALUES ('{}', '{}')'''.format(good_id, good['price']))
                 # Add the stock status to the in_stock table
                 print('Inserting stock status', good['in_stock'], 'for good', good['name'])
-                db.execute_query('INSERT INTO in_stock (good_id, in_stock) VALUES (%s, %s)',
-                                 (good_id, good['in_stock']))
+                db.execute_query('''INSERT INTO in_stock (good_id, in_stock) VALUES ('{}', '{}')'''.format(good_id,
+                                                                                                           good[
+                                                                                                               'in_stock']))
                 # Update the last_confirmed field in the goods table
-                db.execute_query('UPDATE goods SET last_confirmed = %s WHERE id = %s',
-                                 (datetime.fromtimestamp(data['timestamp'], tz=timezone.utc), good_id,))
+                db.execute_query('''UPDATE goods SET last_confirmed = '{}' WHERE id = '{}' '''.format(
+                    datetime.fromtimestamp(data['timestamp'], tz=timezone.utc), good_id, ))
             except Exception as e:
                 print('Insert good error:', e)
                 continue
