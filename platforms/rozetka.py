@@ -11,7 +11,7 @@ params = {'country': 'UA', 'lang': 'ua'}
 log_dir = f'platforms/fetched/{platform_name}/'
 
 
-def search_query(query: str, timeout: int = 30) -> dict:
+def search_query(query: str, timeout: int = 30, logging:bool=False) -> dict:
     print('Fetching data from', platform_name)
     print('Query:', query)
 
@@ -33,7 +33,7 @@ def search_query(query: str, timeout: int = 30) -> dict:
         data = response.json()
 
         # Save the response to a file
-        if log_dir:
+        if log_dir and logging:
             os.makedirs(log_dir, exist_ok=True)
             with open(os.path.join(log_dir, f'{query}-{current_page}-{time.time()}.json'), 'w') as f:
                 json.dump(data, f, indent=2)

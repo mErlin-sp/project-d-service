@@ -20,7 +20,7 @@ params = {
 log_dir = f'platforms/fetched/{platform_name}/'
 
 
-def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
+def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, logging: bool = False) -> dict:
     print('Fetching data from Bigl')
     print('Query:', query)
 
@@ -60,7 +60,7 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1) -> dict:
         # print(data)
 
         # Save the response to a file
-        if log_dir:
+        if log_dir and logging:
             os.makedirs(log_dir, exist_ok=True)
             with open(os.path.join(log_dir, f'{query}-{offset}-{time.time()}.json'), 'w') as f:
                 json.dump(data, f, indent=2)
