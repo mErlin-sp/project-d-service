@@ -2,4 +2,6 @@
 .venv/
 __pycache__/
 fetched/
+db/
+*.rar
 *.http
