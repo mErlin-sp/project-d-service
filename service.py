@@ -217,10 +217,10 @@ if __name__ == '__main__':
     print('')
 
     try:
-        # if debug:
-        #     print('Running the scheduler...')
-        #     # Run the scheduler
-        #     schedule.run_all()
+        print('Running the scheduler...')
+        # Run the scheduler
+        schedule.run_all()
+
         while True:
             schedule.run_pending()
             time.sleep(1)  # Sleep for 1 second to avoid high CPU usage

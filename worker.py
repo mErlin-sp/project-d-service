@@ -152,25 +152,6 @@ def update_db(db: DB, platforms_dir: str, log_dir: str = None):
         # Add the thread to the list
         threads.append(platform_thread)
 
-        # for query_id, query in queries:
-        #     try:
-        #         data = module.search_query(query)
-        #         if log_dir:
-        #             try:
-        #                 path = os.path.join(log_dir, platform)
-        #                 os.makedirs(path, exist_ok=True)
-        #                 with open(os.path.join(path, f'{query}-{time.time()}.json'), 'w') as f:
-        #                     json.dump(data, f, indent=2)
-        #             except Exception as e:
-        #                 print('Failed to save fetched data:', e)
-        #
-        #         update_db_with_fetch_data(db, data, platform, query_id)
-        #
-        #         print('--' * 50)
-        #         print('')
-        #     except Exception as e:
-        #         print('Update DB for platform', platform, 'query', query, 'error:', e)
-
     # Wait for all threads to finish
     for thread in threads:
         thread.join()

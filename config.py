@@ -1,8 +1,10 @@
 import configparser
 import os
 
+DEFAULT_CONFIG_FILE = 'config.ini'
 
-def create_default_config(config_file: str = 'config.ini'):
+
+def create_default_config(config_file: str = DEFAULT_CONFIG_FILE):
     print('Creating a default config file...')
 
     # Create a ConfigParser object
@@ -17,7 +19,7 @@ def create_default_config(config_file: str = 'config.ini'):
         print('Config file created:', config_file)
 
 
-def read_config_value(key: str, section: str = 'DEFAULT', config_file: str = 'config.ini') -> str:
+def read_config_value(key: str, section: str = 'DEFAULT', config_file: str = DEFAULT_CONFIG_FILE) -> str:
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 
@@ -33,7 +35,7 @@ def read_config_value(key: str, section: str = 'DEFAULT', config_file: str = 'co
     return config[section][key]
 
 
-def write_config_value(key: str, value: str, section: str = 'DEFAULT', config_file: str = 'config.ini'):
+def write_config_value(key: str, value: str, section: str = 'DEFAULT', config_file: str = DEFAULT_CONFIG_FILE):
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 

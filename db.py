@@ -18,10 +18,6 @@ class DB:
         self.lock = threading.Lock()
         self.initialized = False
 
-    # def __del__(self):
-    #     if self.cnx:
-    #         self.db_close()
-
     def db_init(self):
         if self.initialized:
             return

@@ -80,7 +80,7 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, log_queries:
                     price = product_params[price_param_index]['value']['value']
                 # logger.debug('[OLX] price:', price)
             except Exception as e:
-                logger.warning('[OLX] Price extraction error:', e)
+                logger.warning('[OLX] Price extraction error: ' + str(e))
 
             result_data['products'].append({
                 'id': product['id'],
@@ -96,7 +96,7 @@ def search_query(query: str, timeout: int = 60 * 5, delay: int = 1, log_queries:
         offset += limit
         time.sleep(delay)
 
-    logger.info('[OLX] Fetching data from', platform_name, 'done')
+    logger.info('[OLX] Fetching data from ' + platform_name + ' done')
     return result_data
 
 # print(search_query('Чехол Iphone 15'))
