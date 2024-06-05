@@ -290,8 +290,7 @@ class DB:
 
 
 class MySQLDB(DB):
-    def __init__(self, host: str = '127.0.0.1', port: int = 3306, user: str = 'root', password: str = 'qwertyuiop',
-                 database: str = 'project-d-db'):
+    def __init__(self, host: str, port: int, user: str, password: str, database: str = 'project-d-db'):
 
         self.host = host
         self.port = port

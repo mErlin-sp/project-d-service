@@ -31,7 +31,7 @@ elif db_type == 'mysql':
     db_host: str = os.getenv('MYSQL_ADDR', '127.0.0.1')
     db_port: int = int(os.getenv('MYSQL_PORT', 3306))
     db_user: str = os.getenv('MYSQL_USER', 'root')
-    db_password: str = os.getenv('MYSQL_PASSWORD', 'qwertyuiop')
+    db_password: str = os.getenv('MYSQL_PASSWORD')
     db_database: str = os.getenv('MYSQL_DB', 'project-d-db')
 
     # Initialize DB
