@@ -15,6 +15,8 @@ import exporter
 import worker
 from db import SqLiteDB, MySQLDB
 
+start_time = time.time()
+
 debug: bool = os.getenv('DEBUG', 'false').lower() == 'true'
 config_file: str = os.getenv('CONFIG_FILE', 'config.ini')
 
@@ -165,6 +167,17 @@ async def restart_service():
         os._exit(0)
     except Exception as e:
         return {'status': 'error', 'message': str(e)}
+
+
+@api.get("/settings/db-type")
+async def get_db_type():
+    return {'db_type': db_type}
+
+
+@api.get("/statistics")
+async def get_statistics():
+    return {'running_time': round(time.time() - start_time, 2),
+            'update_interval': config.read_config_value('UpdateInterval')}
 
 
 def run_api():
