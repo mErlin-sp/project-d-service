@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Docker" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+  <configuration default="false" name="Docker MySQL" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="project-d-service" />
@@ -11,8 +11,8 @@
               <option name="value" value="project-d-db" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
-              <option name="name" value="API_ADDR" />
-              <option name="value" value="0.0.0.0" />
+              <option name="name" value="MYSQL_PASSWORD" />
+              <option name="value" value="qwertyuiop" />
             </DockerEnvVarImpl>
           </list>
         </option>

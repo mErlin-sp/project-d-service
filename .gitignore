@@ -1,9 +1,11 @@
 .idea/
 .venv/
-__pycache__/
+.scannerwork/
+tests/
 fetched/
 db/
 export/
+__pycache__/
 *.rar
 *.http
 *.log

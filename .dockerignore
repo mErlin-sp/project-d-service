@@ -1,5 +1,13 @@
 .idea/
 .venv/
-__pycache__/
+.run/
+.scannerwork/
+.git/
+tests/
 */fetched/*
+db/
+export/
+__pycache__/
 *.http
+*.rar
+*.log

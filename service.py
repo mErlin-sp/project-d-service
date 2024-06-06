@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 import time
 from threading import Thread
 
@@ -41,7 +40,7 @@ else:
     exit(0)
 
 # API parameters
-api_host: str = os.getenv('API_ADDR', '127.0.0.1')
+api_host: str = os.getenv('API_ADDR', '0.0.0.0')
 api_port: int = int(os.getenv('API_PORT', 8000))
 
 # Initialize FastAPI
@@ -201,7 +200,8 @@ def init():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='debug.log', encoding='utf-8', level=logging.INFO)
+    if debug:
+        logging.basicConfig(filename='debug.log', encoding='utf-8', level=logging.INFO)
 
     init()
     print('project-d service is running...')
@@ -217,13 +217,19 @@ if __name__ == '__main__':
     print('')
 
     try:
+        # Wait for 1 minute
+        time.sleep(60)
+
         print('Running the scheduler...')
-        # Run the scheduler
+        # Run service update immediately
         schedule.run_all()
 
+        # Check the scheduled jobs every second
         while True:
+            # Run the scheduled jobs
             schedule.run_pending()
-            time.sleep(1)  # Sleep for 1 second to avoid high CPU usage
+            # Sleep for 1 second to avoid high CPU usage
+            time.sleep(1)
     except KeyboardInterrupt:
         print('keyboard interrupt')
     finally:
