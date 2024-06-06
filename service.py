@@ -168,11 +168,6 @@ async def restart_service():
         return {'status': 'error', 'message': str(e)}
 
 
-@api.get("/settings/db-type")
-async def get_db_type():
-    return {'db_type': db_type}
-
-
 @api.get("/statistics")
 async def get_statistics():
     return {'running_time': round(time.time() - start_time, 2),
