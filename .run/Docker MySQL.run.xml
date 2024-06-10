@@ -14,6 +14,10 @@
               <option name="name" value="MYSQL_PASSWORD" />
               <option name="value" value="qwertyuiop" />
             </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="DB_TYPE" />
+              <option name="value" value="MYSQL" />
+            </DockerEnvVarImpl>
           </list>
         </option>
         <option name="portBindings">
