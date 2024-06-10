@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Service DEBUG" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="Service DEBUG SQLite" type="PythonConfigurationType" factoryName="Python">
     <module name="service" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
