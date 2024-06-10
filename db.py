@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import threading
+from typing import Sequence
 
 import mysql.connector
 from mysql.connector.abstracts import MySQLConnectionAbstract
@@ -185,7 +186,10 @@ class DB:
                 cur = self.cnx.cursor()
 
                 # Execute a query
-                cur.execute('UPDATE tracked_queries SET active = %s WHERE id = %s', (active, query_id))
+                if self.db_type == 'mysql':
+                    cur.execute('UPDATE tracked_queries SET active = %s WHERE id = %s', (active, query_id))
+                elif self.db_type == 'sqlite':
+                    cur.execute('UPDATE tracked_queries SET active = ? WHERE id = ?', (active, query_id))
 
                 # Make sure data is committed to the database
                 self.cnx.commit()
@@ -201,7 +205,10 @@ class DB:
                 cur = self.cnx.cursor()
 
                 # Execute a query
-                cur.execute('INSERT INTO tracked_queries (query) VALUES (%s)', (query,))
+                if self.db_type == 'mysql':
+                    cur.execute('INSERT INTO tracked_queries (query) VALUES (%s)', (query,))
+                elif self.db_type == 'sqlite':
+                    cur.execute('INSERT INTO tracked_queries (query) VALUES (?)', (query,))
 
                 # Make sure data is committed to the database
                 self.cnx.commit()
@@ -213,14 +220,14 @@ class DB:
             finally:
                 cur.close()
 
-    def execute_query(self, query: str, last_row_id=False):
+    def execute_query(self, query: str, last_row_id=False, params: Sequence = ()):
         with self.lock:
             try:
                 # Get a cursor
                 cur = self.cnx.cursor()
 
                 # Execute a query
-                cur.execute(query)
+                cur.execute(query, params)
 
                 if last_row_id:
                     return cur.lastrowid
@@ -259,7 +266,10 @@ class DB:
                 cur = self.cnx.cursor()
 
                 # Execute a query
-                cur.execute('SELECT price,timestamp FROM prices WHERE good_id = %s', (good_id,))
+                if self.db_type == 'mysql':
+                    cur.execute('SELECT price,timestamp FROM prices WHERE good_id = %s', (good_id,))
+                elif self.db_type == 'sqlite':
+                    cur.execute('SELECT price,timestamp FROM prices WHERE good_id = ?', (good_id,))
 
                 # Fetch all results
                 rows = cur.fetchall()
@@ -277,7 +287,10 @@ class DB:
                 cur = self.cnx.cursor()
 
                 # Execute a query
-                cur.execute('SELECT in_stock,timestamp FROM in_stock WHERE good_id = %s', (good_id,))
+                if self.db_type == 'mysql':
+                    cur.execute('SELECT in_stock,timestamp FROM in_stock WHERE good_id = %s', (good_id,))
+                elif self.db_type == 'sqlite':
+                    cur.execute('SELECT in_stock,timestamp FROM in_stock WHERE good_id = ?', (good_id,))
 
                 # Fetch all results
                 rows = cur.fetchall()
@@ -287,6 +300,123 @@ class DB:
             except mysql.connector.Error as e:
                 print('Get In Stock Error:', e)
                 return []
+
+    def get_good_id(self, platform_id: int, query_id: int):
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                if self.db_type == 'mysql':
+                    cur.execute('SELECT id FROM goods WHERE platform_id = %d AND query_id = %s',
+                                (platform_id, query_id))
+                elif self.db_type == 'sqlite':
+                    cur.execute('SELECT id FROM goods WHERE platform_id = ? AND query_id = ?', (platform_id, query_id))
+
+                # Fetch all results
+                rows = cur.fetchall()
+                cur.close()
+                return rows
+
+            except mysql.connector.Error as e:
+                print('Get Good ID Error:', e)
+                return []
+
+    def add_good(self, platform: str, platform_id: int, query_id: int, name: str, href: str, img_href: str,
+                 brand: str) -> int:
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                if self.db_type == 'mysql':
+                    cur.execute('''
+                        INSERT INTO goods (platform,platform_id, query_id, name, href, img_href, brand) VALUES (
+                        %s, %s, %s, %s, %s, %s, %s)
+                    ''', (platform, platform_id, query_id, name, href, img_href, brand))
+                elif self.db_type == 'sqlite':
+                    cur.execute('''
+                        INSERT INTO goods (platform,platform_id, query_id, name, href, img_href, brand) VALUES (
+                        ?, ?, ?, ?, ?, ?, ?)
+                    ''', (platform, platform_id, query_id, name, href, img_href, brand))
+
+                # Make sure data is committed to the database
+                self.cnx.commit()
+
+                return cur.lastrowid
+            except mysql.connector.Error as e:
+                print('Insert Good Error:', e)
+                return -1
+            finally:
+                cur.close()
+
+    def add_price(self, good_id: int, price: float) -> int:
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                if self.db_type == 'mysql':
+                    cur.execute('INSERT INTO prices (good_id, price) VALUES (%s, %s)', (good_id, price))
+                elif self.db_type == 'sqlite':
+                    cur.execute('INSERT INTO prices (good_id, price) VALUES (?, ?)', (good_id, price))
+
+                # Make sure data is committed to the database
+                self.cnx.commit()
+
+                return cur.lastrowid
+            except mysql.connector.Error as e:
+                print('Insert Price Error:', e)
+                return -1
+            finally:
+                cur.close()
+
+    def add_in_stock(self, good_id: int, in_stock: bool) -> int:
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                if self.db_type == 'mysql':
+                    cur.execute('INSERT INTO in_stock (good_id, in_stock) VALUES (%s, %s)', (good_id, in_stock))
+                elif self.db_type == 'sqlite':
+                    cur.execute('INSERT INTO in_stock (good_id, in_stock) VALUES (?, ?)', (good_id, in_stock))
+
+                # Make sure data is committed to the database
+                self.cnx.commit()
+
+                return cur.lastrowid
+            except mysql.connector.Error as e:
+                print('Insert In Stock Error:', e)
+                return -1
+            finally:
+                cur.close()
+
+    def update_last_confirmed(self, good_id: int, last_confirmed: str) -> int:
+        with self.lock:
+            try:
+                # Get a cursor
+                cur = self.cnx.cursor()
+
+                # Execute a query
+                if self.db_type == 'mysql':
+                    cur.execute('UPDATE goods SET last_confirmed = %s WHERE id = %s', (last_confirmed, good_id))
+                elif self.db_type == 'sqlite':
+                    cur.execute('UPDATE goods SET last_confirmed = ? WHERE id = ?', (last_confirmed, good_id))
+
+                # Make sure data is committed to the database
+                self.cnx.commit()
+
+                return cur.lastrowid
+            except mysql.connector.Error as e:
+                print('Update Last Confirmed Error:', e)
+                return -1
+            finally:
+                cur.close()
 
 
 class MySQLDB(DB):

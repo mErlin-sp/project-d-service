@@ -5,9 +5,10 @@ from threading import Thread
 
 import schedule
 import uvicorn
+import yaml
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, Response
 
 import config
 import exporter
@@ -15,11 +16,12 @@ import worker
 from db import SqLiteDB, MySQLDB
 
 start_time = time.time()
+update_count = 0
 
 debug: bool = os.getenv('DEBUG', 'false').lower() == 'true'
 config_file: str = os.getenv('CONFIG_FILE', 'config.ini')
 
-db_type: str = os.getenv('DB_TYPE', 'sqlite')
+db_type: str = os.getenv('DB_TYPE', 'sqlite').lower()
 
 if db_type == 'sqlite':
     db_dir: str = os.getenv('DB_DIR', 'db/')
@@ -62,6 +64,13 @@ platforms_dir = 'platforms/'
 @api.get("/")
 async def root():
     return {"message": "Service is running..."}
+
+
+@api.get("/openapi.yaml")
+async def get_openapi_yaml():
+    openapi_json = api.openapi()
+    openapi_yaml = yaml.dump(openapi_json, sort_keys=False)
+    return Response(content=openapi_yaml, media_type="application/x-yaml")
 
 
 if debug:
@@ -171,7 +180,22 @@ async def restart_service():
 @api.get("/statistics")
 async def get_statistics():
     return {'running_time': round(time.time() - start_time, 2),
-            'update_interval': config.read_config_value('UpdateInterval')}
+            'update_count': update_count,
+            'update_interval': config.read_config_value('UpdateInterval'),
+            'platforms_count': len(worker.list_platforms(platforms_dir)),
+            'queries_count': len(db.get_queries()),
+            'goods_count': len(db.get_goods()),
+            }
+
+
+@api.get("/log")
+async def get_log():
+    if not debug:
+        return {'status': 'error', 'message': 'Service log is disabled in production mode'}
+    elif not os.path.exists('debug.log'):
+        return {'status': 'error', 'message': 'Log file not found'}
+    else:
+        return FileResponse('debug.log', media_type='text/plain', filename='debug.log')
 
 
 def run_api():

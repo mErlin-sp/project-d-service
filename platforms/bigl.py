@@ -1,10 +1,10 @@
 import json
 import logging
 import os
-import sys
 import time
 
 from gql.transport.requests import RequestsHTTPTransport
+
 from gql import Client, gql
 
 platform_name = 'bigl'
