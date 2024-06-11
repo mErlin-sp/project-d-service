@@ -44,7 +44,7 @@ else:
 # API parameters
 api_host: str = os.getenv('API_ADDR', '0.0.0.0')
 api_port: int = int(os.getenv('API_PORT', 8000))
-root_path: str = '/' if debug else os.getenv('API_ROOT_PATH', '/api')
+root_path: str = '' if debug else os.getenv('API_ROOT_PATH', '/api')
 
 # Initialize FastAPI
 api = FastAPI(root_path=root_path)
