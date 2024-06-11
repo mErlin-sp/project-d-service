@@ -1,0 +1,12 @@
+FROM pypy:3.10
+
+WORKDIR /usr/src/project-d-service
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD [ "pypy3", "./service.py" ]

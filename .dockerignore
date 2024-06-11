@@ -5,7 +5,7 @@
 .git/
 tests/
 */fetched/*
-db/
+#db/
 export/
 __pycache__/
 *.http
